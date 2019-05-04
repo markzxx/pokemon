@@ -7,27 +7,32 @@
 #include <opencv2/core/core.hpp>
 #include <algorithm>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Bool.h>
+
 
 using namespace cv;
 using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
 static const std::string GREY_WINDOW = "灰度";
 static const std::string CANNY_WINDOW = "canny";
+Mat img;
+int fileNum = 1;
 
-
-class ImageConverter
+class Searcher
 {
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
   ros::Publisher image_pub_;
+  ros::Subscriber save_sub_;
 
 public:
-  ImageConverter()
+  Searcher()
     : it_(nh_)
   {
     // Subscribe to input video feed and publish output video feed
-    image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &ImageConverter::imageCb, this);
+    image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
+	save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this); 
     image_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/pokemon_go/searcher", 1);
 
     cv::namedWindow(OPENCV_WINDOW);
@@ -35,10 +40,20 @@ public:
 //	cv::namedWindow(CANNY_WINDOW);	
   }
 
-  ~ImageConverter()
+  ~Searcher()
   {
     cv::destroyWindow(OPENCV_WINDOW);
 	cv::destroyWindow(GREY_WINDOW);
+  }
+  
+  void saveImg(std_msgs::Bool save){
+	  if(save.data){
+		stringstream stream;
+        stream <<"/home/ubuntu/1001/pokemon" << fileNum <<".jpg";
+		imwrite(stream.str(),img);	
+		cout <<"pokemon" << fileNum << " had Saved."<< endl;
+		fileNum++;		
+	  }
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -83,7 +98,7 @@ public:
   
   void detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
 	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 30, iLowV = 221, iHighV = 255;
-	Mat &img = cv_ptr->image;
+	img = cv_ptr->image;
 	Mat imgHSV;
 	vector<Mat> hsvSplit;
 	cvtColor(img, imgHSV, COLOR_BGR2HSV);
@@ -200,7 +215,7 @@ public:
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "pokemon_searching");
-  ImageConverter ic;
+  Searcher ic;
   ros::spin();
   return 0;
 }
