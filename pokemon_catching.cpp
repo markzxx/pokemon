@@ -124,8 +124,25 @@ public:
 	//	box.points(tem_vertex);
 		rectangles.push_back(box.boundingRect());
 		idx.push_back(i);
-		rectangle(img, rectangles[i].tl(), rectangles[i].br(), CV_RGB(255,0,255));
+		// rectangle(img, rectangles[i].tl(), rectangles[i].br(), CV_RGB(255,0,255));
 	}
+
+	vector<int> idxNOT;
+	for(int i=0;i<idx.size();i++){
+		Rect r = rectangles[idx[i]];
+		if (r.br().y < height/3 ) idxNOT.push_back(idx[i]);
+	}
+
+	vector<int> diff;
+	std::set_difference(idx.begin(), idx.end(), idxNOT.begin(), idxNOT.end(),
+        std::inserter(diff, diff.begin()));
+	idx = diff;
+	for(int i = 0;i<diff.size();i++){
+		rectangle(img, rectangles[diff[i]].tl(), rectangles[diff[i]].br(), CV_RGB(255,0,255));
+	}
+
+
+
 	MERGE:
 	for(int i = 0;i<idx.size();i++){
 		int id1 = idx[i];
@@ -146,18 +163,10 @@ public:
 		}
 	}
 
-	vector<int> idxNOT;
+	
+		
 	for(int i=0;i<idx.size();i++){
 		Rect r = rectangles[idx[i]];
-		if (r.br().y < height/2 ) idxNOT.push_back(idx[i]);
-	}
-
-	vector<int> diff;
-	std::set_difference(idx.begin(), idx.end(), idxNOT.begin(), idxNOT.end(),
-        std::inserter(diff, diff.begin()));
-		
-	for(int i=0;i<diff.size();i++){
-		Rect r = rectangles[diff[i]];
 		float s = r.area();
 		if(s>max_s){
 			max_s = s;
