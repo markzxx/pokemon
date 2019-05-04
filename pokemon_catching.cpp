@@ -103,11 +103,11 @@ public:
 
 
 	if (dists[1] > 5) {
-        minDis.data =  1;
+        minDis.data =  1;//前
         zeroCount = 0;
 	}
 	else if (dists[1] < 0){
-        minDis.data =  2;
+        minDis.data =  2;//后
         zeroCount = 0;
 	}
     else zeroCount++;
@@ -184,6 +184,7 @@ public:
 	for(int i=0;i<idx.size();i++){
 		Rect r = rectangles[idx[i]];
 		if (r.br().y < height/3 ) idxNOT.push_back(idx[i]);
+        if (r.tl().y > 3*height/5 ) idxNOT.push_back(idx[i]);
 	}
 
 	vector<int> diff;
