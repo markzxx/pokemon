@@ -71,7 +71,7 @@ public:
 	rect.data.push_back(5*height/6);
 	
 	//detect the white pokemon, 记录白框的四个顶点
-	detect(cv_ptr, rect);
+	detect(cv_ptr, rect, width, height);
 //	printf("p1x:%f p1y%f p3x:%f p3y:%f\n", rect.data[0], rect.data[1], rect.data[8],rect.data[9]);
     // Update GUI Window
     cv::imshow(OPENCV_WINDOW, cv_ptr->image);
@@ -81,7 +81,7 @@ public:
     image_pub_.publish(rect);
   }
   
-  void detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect){
+  void detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
 	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 30, iLowV = 221, iHighV = 255;
 	Mat &img = cv_ptr->image;
 	Mat imgHSV;
@@ -145,9 +145,19 @@ public:
 			goto MERGE;
 		}
 	}
-		
+
+	vector<int> idxNOT;
 	for(int i=0;i<idx.size();i++){
 		Rect r = rectangles[idx[i]];
+		if (r.br().y < height/2 ) idxNOT.push_back(idx[i]);
+	}
+
+	vector<int> diff;
+	std::set_difference(idx.begin(), idx.end(), idxNOT.begin(), idxNOT.end(),
+        std::inserter(diff, diff.begin()));
+		
+	for(int i=0;i<diff.size();i++){
+		Rect r = rectangles[diff[i]];
 		float s = r.area();
 		if(s>max_s){
 			max_s = s;
