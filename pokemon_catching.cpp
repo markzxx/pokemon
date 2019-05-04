@@ -102,7 +102,7 @@ public:
 	minDis.data =  0;
 
 
-	if (dists[1] > 5) {
+	if (dists[1] > 10) {
         minDis.data =  1;//前
         zeroCount = 0;
 	}
