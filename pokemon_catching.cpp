@@ -18,6 +18,7 @@ static const std::string GREY_WINDOW = "灰度";
 static const std::string CANNY_WINDOW = "canny";
 Mat img;
 int fileNum = 1;
+int zeroCount = 0;
 
 class Searcher
 {
@@ -26,6 +27,7 @@ class Searcher
   image_transport::Subscriber image_sub_;
   ros::Publisher image_pub_;
   ros::Subscriber save_sub_;
+  ros::Publisher save_pub_;
 
 public:
   Searcher()
@@ -35,6 +37,7 @@ public:
     image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
 	save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this);
     image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
+    save_pub_ = nh_.advertise<std_msgs::Bool>("/pokemon_go/save", 1);
 
     cv::namedWindow(OPENCV_WINDOW);
 	cv::namedWindow(GREY_WINDOW);
@@ -90,17 +93,37 @@ public:
 	//detect the white pokemon, 记录白框的四个顶点
 	Rect r = detect(cv_ptr, rect, width, height);
 	vector<int> dists;
-	dists.push_back(r.tl().x - width/3);
-	dists.push_back(r.tl().y - height/6);
-	dists.push_back(2*width/3 - r.br().x );
-	dists.push_back(5*height/6 - r.br().y);
+	dists.push_back(r.tl().x - width/3);//左
+	dists.push_back(r.tl().y - height/6);//上
+	dists.push_back(2*width/3 - r.br().x );//右
+	dists.push_back(5*height/6 - r.br().y);//下
 
 	std_msgs::Int32 minDis;
-	minDis.data =  dists[3];
+	minDis.data =  0;
 
-	for (int i = 0; i < 3; i++) {
-		if (dists[i] < minDis.data) minDis.data = dists[i];
+
+	if (dists[1] > 5) {
+        minDis.data =  1;
+        zeroCount = 0;
 	}
+	else if (dists[1] < 0){
+        minDis.data =  2;
+        zeroCount = 0;
+	}
+    else zeroCount++;
+
+    if (zeroCount == 10) {
+        std_msgs::Bool saveImage;
+        saveImage.data = true;
+        save_pub_.publish(saveImage);
+    }
+
+    cout<< dists[1] <<endl;
+
+
+//	for (int i = 0; i < 3; i++) {
+//		if (dists[i] < minDis.data) minDis.data = dists[i];
+//	}
 
 //	printf("p1x:%f p1y%f p3x:%f p3y:%f\n", rect.data[0], rect.data[1], rect.data[8],rect.data[9]);
     // Update GUI Window
