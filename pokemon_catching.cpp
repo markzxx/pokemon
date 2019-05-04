@@ -168,7 +168,7 @@ public:
   
   bool cross(Rect  r1, Rect  r2){
 	int error = 30;
-	return (r1+Size(0,error) & r2).area() > 0;
+	return (r1+Size(0,error) & r2).area() > 0 || (r1 & r2+Size(0,error)).area() > 0;
   }
   
   void mergeRec(int id, vector<int> &merge, vector<Rect> &rectangles){
