@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <algorithm>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float32MultiArray.h>
 
 using namespace cv;
@@ -28,7 +29,7 @@ public:
   {
     // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &ImageConverter::imageCb, this);
-    image_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/pokemon_go/searcher", 1);
+    image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
 
     cv::namedWindow(OPENCV_WINDOW);
 	cv::namedWindow(GREY_WINDOW);
@@ -54,6 +55,7 @@ public:
       return;
     }
 	// 传递出去的信息，外框和内框共16个点
+	
 	std_msgs::Float32MultiArray rect;
 
     // Draw an target square on the video stream
@@ -71,17 +73,31 @@ public:
 	rect.data.push_back(5*height/6);
 	
 	//detect the white pokemon, 记录白框的四个顶点
-	detect(cv_ptr, rect, width, height);
+	Rect r = detect(cv_ptr, rect, width, height);
+	vector<int> dists;
+	dists.push_back(r.tl().x - width/3);
+	dists.push_back(r.tl().y - height/6);
+	dists.push_back(2*width/3 - r.br().x );
+	dists.push_back(5*height/6 - r.br().y);
+
+	std_msgs::Int32 minDis;
+	minDis.data =  dists[3];
+	
+	for (int i = 0; i < 3; i++) {
+		if (dists[i] < minDis.data) minDis.data = dists[i];
+	}
+	cout <<  minDis.data <<endl;
+
 //	printf("p1x:%f p1y%f p3x:%f p3y:%f\n", rect.data[0], rect.data[1], rect.data[8],rect.data[9]);
     // Update GUI Window
     cv::imshow(OPENCV_WINDOW, cv_ptr->image);
     cv::waitKey(3);
 	
     // Output modified video stream
-    image_pub_.publish(rect);
+    image_pub_.publish(minDis);
   }
   
-  void detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
+  Rect detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
 	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 30, iLowV = 221, iHighV = 255;
 	Mat &img = cv_ptr->image;
 	Mat imgHSV;
@@ -176,6 +192,8 @@ public:
 	}
 	
 	rectangle(img, rectangles[max_idx].tl(), rectangles[max_idx].br(), CV_RGB(255,255,0));
+
+	return rectangles[max_idx];
 //	namedWindow("绘制的最小矩形面积",WINDOW_NORMAL);
 
 //	imshow("绘制的最小矩形面积",img);
