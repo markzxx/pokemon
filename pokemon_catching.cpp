@@ -114,6 +114,7 @@ public:
 //	imshow(CANNY_WINDOW, cannyImage);                //用矩形圈出轮廓并返回位置坐标      
 	Point2f vertex[4];
 	float max_s=0;
+	int max_idx=0;
 	vector<Rect> rectangles;
 	vector<int> idx;
 	for(int i=0;i<contours.size();i++){
@@ -123,6 +124,7 @@ public:
 	//	box.points(tem_vertex);
 		rectangles.push_back(box.boundingRect());
 		idx.push_back(i);
+		rectangle(img, rectangles[i].tl(), rectangles[i].br(), CV_RGB(255,0,255));
 	}
 	MERGE:
 	for(int i = 0;i<idx.size();i++){
@@ -149,23 +151,14 @@ public:
 		float s = r.area();
 		if(s>max_s){
 			max_s = s;
-			vertex[0] = r.tl();
-			vertex[1] = Point2f(r.x + r.width, r.y);
-			vertex[2] = r.br();
-			vertex[3] = Point2f(r.x, r.y+r.height);
+			max_idx = idx[i];
 		}
-	}
-	for(int i=0;i<4;i++){
-		rect.data.push_back(vertex[i].x);
-		rect.data.push_back(vertex[i].y);
+		rectangle(img, r.tl(), r.br(), CV_RGB(0,0,255));
 	}
 	
-	line(img,vertex[0],vertex[1],Scalar(100,200,211),2,LINE_AA);
-	line(img,vertex[1],vertex[2],Scalar(100,200,211),2,LINE_AA);
-	line(img,vertex[2],vertex[3],Scalar(100,200,211),2,LINE_AA);
-	line(img,vertex[3],vertex[0],Scalar(100,200,211),2,LINE_AA);
+	rectangle(img, rectangles[max_idx].tl(), rectangles[max_idx].br(), CV_RGB(255,255,0));
 //	namedWindow("绘制的最小矩形面积",WINDOW_NORMAL);
-	
+
 //	imshow("绘制的最小矩形面积",img);
   }
   
@@ -174,8 +167,8 @@ public:
   }
   
   bool cross(Rect  r1, Rect  r2){
-	  int error = 10;
-	return (r1+Size(error, error) & r2+Size(error, error)).area() > 0;
+	int error = 30;
+	return (r1+Size(0,error) & r2).area() > 0;
   }
   
   void mergeRec(int id, vector<int> &merge, vector<Rect> &rectangles){
