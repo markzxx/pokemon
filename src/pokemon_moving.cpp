@@ -12,6 +12,7 @@ ros::Publisher cmdVelPub;
 */
 bool stop=false;
 int threshold=10;
+using namespace std;
 void shutdown(int sig)
 {
   cmdVelPub.publish(geometry_msgs::Twist());//使机器人停止运动
@@ -20,6 +21,7 @@ void shutdown(int sig)
 }
 
 void run(const std_msgs::Int32 msg){
+cout<< msg.data<<endl;
 
 	geometry_msgs::Twist speed; // 控制信号载体 Twist message
 	if(msg.data==0){
@@ -83,4 +85,5 @@ int main(int argc, char** argv)
   }
   return 0;
 }
+
 
