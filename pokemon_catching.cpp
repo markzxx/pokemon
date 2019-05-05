@@ -19,6 +19,7 @@ static const std::string CANNY_WINDOW = "canny";
 Mat img;
 int fileNum = 1;
 int zeroCount = 0;
+bool flag=false;
 
 class Searcher
 {
@@ -27,6 +28,7 @@ class Searcher
   image_transport::Subscriber image_sub_;
   ros::Publisher image_pub_;
   ros::Subscriber save_sub_;
+  ros::Subscriber move_sub_;
   ros::Publisher save_pub_;
 
 public:
@@ -36,6 +38,7 @@ public:
     // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
 	save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this);
+	move_sub_ = nh_.subscribe("/pokemon_go/auto", 1, &Searcher::autoMove, this);
     image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
     save_pub_ = nh_.advertise<std_msgs::Bool>("/pokemon_go/save", 1);
 
@@ -48,6 +51,12 @@ public:
   {
     cv::destroyWindow(OPENCV_WINDOW);
 	cv::destroyWindow(GREY_WINDOW);
+  }
+  
+  void autoMove(std_msgs::Bool move){
+	  if(move.data){
+		  flag = true;
+	  }
   }
 
   void saveImg(std_msgs::Bool save){
@@ -102,23 +111,25 @@ public:
 	minDis.data =  0;
 
 
-	if (dists[1] > 10) {
-        minDis.data =  1;//前
+	if (dists[1] < 0 || dists[3] <0){
+        minDis.data =  2;//后
         zeroCount = 0;
 	}
-	else if (dists[1] < 0){
-        minDis.data =  2;//后
+	else if (dists[1] > 10 && dists[3] >10) {
+        minDis.data =  1;//前
         zeroCount = 0;
 	}
     else zeroCount++;
 
+
     if (zeroCount == 10) {
         std_msgs::Bool saveImage;
         saveImage.data = true;
-        save_pub_.publish(saveImage);
+        if(flag) save_pub_.publish(saveImage);
+		flag = false;
     }
 
-    cout<< dists[1] <<endl;
+//    cout<< dists[1] <<endl;
 
 
 //	for (int i = 0; i < 3; i++) {
@@ -131,11 +142,12 @@ public:
     cv::waitKey(3);
 	
     // Output modified video stream
-    image_pub_.publish(minDis);
+	if(flag)
+		image_pub_.publish(minDis);
   }
   
   Rect detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
-	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 30, iLowV = 221, iHighV = 255;
+	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 40, iLowV = 200, iHighV = 255;
 	img = cv_ptr->image;
 	Mat imgHSV;
 	vector<Mat> hsvSplit;

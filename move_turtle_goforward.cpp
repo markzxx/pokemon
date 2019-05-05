@@ -22,7 +22,6 @@ void shutdown(int sig)
 void run(const std_msgs::Int32 msg){
 
 	geometry_msgs::Twist speed; // 控制信号载体 Twist message
-	
 	if(msg.data==0){
 		 speed.linear.x = 0;
 		 speed.angular.z = 0; // 设置角速度为0rad/s，正为左转，负为右转
@@ -44,6 +43,8 @@ void run(const std_msgs::Int32 msg){
 		speed.linear.x = 0.1;
 		speed.angular.z = -0.1; // 设置角速度为0rad/s，正为左转，负为右转
 	}
+	else if(msg.data==5)
+		return;
     cmdVelPub.publish(speed); // 将刚才设置的指令发送给机器人
 }
 
@@ -53,10 +54,10 @@ int main(int argc, char** argv)
   
   ros::init(argc, argv, "move_turtle_goforward");//初始化ROS,它允许ROS通过命令行进行名称重映射
   ros::NodeHandle node;//为这个进程的节点创建一个句柄
-  cmdVelPub = node.advertise<geometry_msgs::Twist>("/mobile_base/commands/velocity", 1);//在/mobile_base/commands/velocity topic上发布一个geometry_msgs/Twist的消息
+  cmdVelPub = node.advertise<geometry_msgs::Twist>("turtle01/mobile_base/commands/velocity", 1);//在/mobile_base/commands/velocity topic上发布一个geometry_msgs/Twist的消息
 
  	ros::NodeHandle n;
-  ros::Subscriber sub = n.subscribe("chatter", 1000, run);
+  ros::Subscriber sub = n.subscribe("/pokemon_go/searcher", 1000, run);
 
   //ros::Rate loopRate(500);//ros::Rate对象可以允许你指定自循环的频率
   //signal(SIGINT, shutdown);

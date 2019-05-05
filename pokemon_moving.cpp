@@ -21,7 +21,7 @@ public:
   Mover(nh_)
   {
     // Subscribe to input video feed and publish output video feed
-    search_sub_ = it_.subscribe("/pokemon_go/searcher", 1, &Mover::moving, this);
+    search_sub_ = it_.subscribe("/pokemon_go/save", 1, &Mover::moving, this);
   }
 
   ~Mover()
