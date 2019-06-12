@@ -11,6 +11,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
+
 using namespace cv;
 using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
@@ -20,6 +21,8 @@ Mat img;
 int fileNum = 1;
 int zeroCount = 0;
 bool flag=false;
+bool listen = true;
+set<int> tagId;
 
 class Searcher
 {
