@@ -70,7 +70,7 @@ public:
     }
 
     void Explore::visualizeFrontiers() {
-        ROS_DEBUG("visualising %lu tags", frontiers.size());
+        ROS_DEBUG("visualising %lu tags", tagMap.size());
         visualization_msgs::MarkerArray markers_msg;
         std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
         visualization_msgs::Marker m;
