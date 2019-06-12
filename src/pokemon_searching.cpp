@@ -22,7 +22,7 @@ int fileNum = 1;
 int zeroCount = 0;
 bool flag = false;
 bool listen_tag = true;
-map<int, geometry_msgs::Pose> tagId;
+map<int, geometry_msgs::Pose> tagMap;
 
 class Searcher
 {
@@ -32,6 +32,7 @@ class Searcher
 	ros::Publisher image_pub_;
 	ros::Subscriber save_sub_;
 	ros::Publisher tag_pub_;
+    ros::Subscriber camera_sub_;
 	ros::Subscriber tag_sub_;
 
 
@@ -57,20 +58,29 @@ public:
 
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
-            tagId[atg.id] = atg.pose;
+            tagMap[atg.id] = atg.pose;
 		}
 	}
 
 	void saveImg(std_msgs::Bool save) {
-        for (auto it : tagId) {
+
+        while (!tagMap.empty()) {
+            auto it = tagMap.begin();
             ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
+            tag_pub_.publish(it.second);
+            camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
+            tagMap.erase(it);
         }
-//        stringstream stream;
-//        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
-//        imwrite(stream.str(), img);
-//        cout << "pokemon" << fileNum << " had Saved." << endl;
-//        fileNum++;
-//        listen_tag = true;
+
+
+    }
+
+    void screenShot(std_msgs:: bool &a) {
+        stringstream stream;
+        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
+        imwrite(stream.str(), img);
+        cout << "pokemon" << fileNum << " had Saved." << endl;
+        fileNum++;
 	}
 
 	void imageCb(const sensor_msgs::ImageConstPtr &msg) {
