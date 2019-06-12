@@ -70,7 +70,8 @@ public:
             // printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
             //        atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
-            if (abs(tagNumric[atg.id] - tmp) > 0.1)
+            if (abs(tagNumric[atg.id] - tmp) > 0.1 && good)
+            	
                 autoSave();
             tagNumric[atg.id] = tmp;
 		}
@@ -167,9 +168,9 @@ public:
         Rect r = detect(cv_ptr, width, height);
         // 78 185 252 240
         // 640 480 -> 320 240
-        cout << "x: " <<abs((r.br().x+r.tl().x)/2-320) << endl;
-        cout << "y: " <<abs((r.tl().y+r.br().y)/2-240) << endl;
-        cout << "width: " <<r.br().x-r.tl().x << endl;
+        // cout << "x: " <<abs((r.br().x+r.tl().x)/2-320) << endl;
+        // cout << "y: " <<abs((r.tl().y+r.br().y)/2-240) << endl;
+        // cout << "width: " <<r.br().x-r.tl().x << endl;
         // cout << "y_center: " <<(r.tl().y+r.br().y)/2 << endl;
         // printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
 		// printf("width:%d height%d\n", width, height);
@@ -177,8 +178,8 @@ public:
 		if (abs((r.br().x+r.tl().x)/2-320)<50 
 			&& abs((r.tl().y+r.br().y))/2-240<150
 			&& r.br().x-r.tl().x > 100) 
-		{good = true;
-			cout << "photo! "<< endl;
+		{	good = true;
+			// cout << "photo! "<< endl;
 		}
 			
 		else good = false;
