@@ -174,9 +174,9 @@ public:
         // printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
 		// printf("width:%d height%d\n", width, height);
 
-		if (abs((r.br().x+r.tl().x)/2-320)<30 
+		if (abs((r.br().x+r.tl().x)/2-320)<50 
 			&& abs((r.tl().y+r.br().y))/2-240<150
-			&& r.br().x-r.tl().x > 200) 
+			&& r.br().x-r.tl().x > 100) 
 			good = true;
 		else good = false;
 
