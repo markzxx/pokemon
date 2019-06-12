@@ -22,8 +22,8 @@ Mat img;
 int fileNum = 1;
 int zeroCount = 0;
 bool flag=false;
-//bool listen = true;
-//set<int> tagId;
+bool listen_tag = true;
+set<int> tagId;
 
 class Searcher
 {
