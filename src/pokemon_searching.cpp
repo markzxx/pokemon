@@ -22,7 +22,7 @@ int fileNum = 1;
 int zeroCount = 0;
 bool flag = false;
 bool listen_tag = true;
-set<int> tagId;
+map<int, geometry_msgs::Pose> tagId;
 
 class Searcher
 {
@@ -56,27 +56,21 @@ public:
 	}
 
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
-		if (!listen_tag)
-			return;
-
 		for (auto atg : apriltags.detections) {
-            if (tagId.find(atg.id) == tagId.end()) {
-				tag_pub_.publish(atg.pose);
-				tagId.insert(atg.id);
-				ROS_ERROR("tag: %d", atg.id);
-				listen_tag = false;
-				return;
-			}
+            tagId[atg.id] = atg.pose;
 		}
 	}
 
 	void saveImg(std_msgs::Bool save) {
-        stringstream stream;
-        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
-        imwrite(stream.str(), img);
-        cout << "pokemon" << fileNum << " had Saved." << endl;
-        fileNum++;
-        listen_tag = true;
+        for (auto it : tagId) {
+            ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.x, it.second.y);
+        }
+//        stringstream stream;
+//        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
+//        imwrite(stream.str(), img);
+//        cout << "pokemon" << fileNum << " had Saved." << endl;
+//        fileNum++;
+//        listen_tag = true;
 	}
 
 	void imageCb(const sensor_msgs::ImageConstPtr &msg) {
