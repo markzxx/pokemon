@@ -65,8 +65,7 @@ public:
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
-            double tmp =
-                    atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
+            double tmp = atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
             printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
                    atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
