@@ -66,8 +66,8 @@ public:
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
             double tmp = atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
-            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
-                   atg.pose.orientation.z, atg.pose.orientation.w, tmp);
+            // printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
+            //        atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
             if (abs(tagNumric[atg.id] - tmp) > 0.1)
                 autoSave();
