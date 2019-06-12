@@ -64,12 +64,11 @@ public:
 
 	void saveImg(std_msgs::Bool save) {
 
-        while (!tagMap.empty()) {
-            auto it = tagMap.begin();
+        for (auto it : tagMap) {
             ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
             tag_pub_.publish(it.second);
             camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
-            tagMap.erase(it);
+//            tagMap.erase(it);
         }
 
 
