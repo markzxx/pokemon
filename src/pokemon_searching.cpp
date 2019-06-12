@@ -22,7 +22,7 @@ Mat img;
 int fileNum = 1;
 int zeroCount = 0;
 bool flag = false;
-bool listen_tag = true;
+bool good = false;
 map<int, geometry_msgs::Pose> tagMap;
 map<int, double> tagNumric;
 unsigned last_markers_count_ = 0;
@@ -67,10 +67,10 @@ public:
             tagMap[atg.id] = atg.pose;
             double tmp =
                     atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
-            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
+//            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
                    atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
-            if (abs(tagNumric[atg.id] - tmp) > 0.1)
+            if (abs(tagNumric[atg.id] - tmp) > 0.1 && good)
                 autoSave();
             tagNumric[atg.id] = tmp;
 		}
@@ -130,8 +130,6 @@ public:
         auto it = *(tagMap.begin());
         ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
         tag_pub_.publish(it.second);
-
-
     }
 
     void autoSave() {
@@ -155,8 +153,6 @@ public:
 			ROS_ERROR("cv_bridge exception: %s", e.what());
 			return;
 		}
-		// 传递出去的信息，外框和内框共16个点
-
 		std_msgs::Float32MultiArray rect;
 
 		// Draw an target square on the video stream
@@ -166,8 +162,9 @@ public:
 		//detect the white pokemon, 记录白框的四个顶点
         Rect r = detect(cv_ptr, width, height);
 
-		// Update GUI Window
-		cv::imshow(OPENCV_WINDOW, cv_ptr->image);
+        if (r.tl())
+            // Update GUI Window
+            cv::imshow(OPENCV_WINDOW, cv_ptr->image);
 		cv::waitKey(3);
 	}
 
