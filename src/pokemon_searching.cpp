@@ -88,9 +88,6 @@ public:
         m.lifetime = ros::Duration(0);
         m.frame_locked = true;
 
-        // weighted frontiers are always sorted
-        double min_cost = frontiers.empty() ? 0. : frontiers.front().cost;
-
         m.action = visualization_msgs::Marker::ADD;
         size_t id = 0;
         for (auto &tag_iter : tagMap) {
