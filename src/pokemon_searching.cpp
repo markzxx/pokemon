@@ -56,11 +56,11 @@ public:
 	}
 
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
-        ROS_ERROR("listen");
 		if (!listen_tag)
 			return;
 
 		for (auto atg : apriltags.detections) {
+            ROS_ERROR("id: %d", atg.id);
 			if (tagId.find(atg.id) != tagId.end()) {
 				tag_pub_.publish(atg.pose);
 				tagId.insert(atg.id);
