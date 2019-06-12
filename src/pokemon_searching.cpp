@@ -11,6 +11,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
+#include <visualization_msgs/MarkerArray.h>
 
 using namespace cv;
 using namespace std;
@@ -34,6 +35,7 @@ class Searcher
 	ros::Publisher tag_pub_;
     ros::Subscriber camera_sub_;
 	ros::Subscriber tag_sub_;
+    ros::Publisher marker_array_publisher_;
 
 
 public:
@@ -46,6 +48,8 @@ public:
         tag_pub_ = nh_.advertise<geometry_msgs::Pose>("/apriltag_pose", 1);
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
         camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
+        marker_array_publisher_ =
+                private_nh_.advertise<visualization_msgs::MarkerArray>("tags", 5);
 		cv::namedWindow(OPENCV_WINDOW);
 //		cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
@@ -61,7 +65,60 @@ public:
             tagMap[atg.id] = atg.pose;
             autoSave();
 		}
-	}
+        visualizeFrontiers();
+    }
+
+    void Explore::visualizeFrontiers() {
+        ROS_DEBUG("visualising %lu tags", frontiers.size());
+        visualization_msgs::MarkerArray markers_msg;
+        std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
+        visualization_msgs::Marker m;
+
+        m.header.frame_id = costmap_client_.getGlobalFrameID();
+        m.header.stamp = ros::Time::now();
+        m.ns = "tags";
+        m.scale.x = 1.0;
+        m.scale.y = 1.0;
+        m.scale.z = 1.0;
+        m.color.r = 0;
+        m.color.g = 0;
+        m.color.b = 255;
+        m.color.a = 255;
+        // lives forever
+        m.lifetime = ros::Duration(0);
+        m.frame_locked = true;
+
+        // weighted frontiers are always sorted
+        double min_cost = frontiers.empty() ? 0. : frontiers.front().cost;
+
+        m.action = visualization_msgs::Marker::ADD;
+        size_t id = 0;
+        for (auto &tag_iter : tagMap) {
+            m.type = visualization_msgs::Marker::POINTS;
+            m.id = int(id);
+            m.scale.x = 0.1;
+            m.scale.y = 0.1;
+            m.scale.z = 0.1;
+            m.points = frontier.points;
+
+            markers.push_back(m);
+            ++id;
+            m.type = visualization_msgs::Marker::SPHERE;
+            m.id = int(id);
+            m.pose.position = tag_iter.second.position;
+        }
+        size_t current_markers_count = markers.size();
+
+        // delete previous markers, which are now unused
+        m.action = visualization_msgs::Marker::DELETE;
+        for (; id < last_markers_count_; ++id) {
+            m.id = int(id);
+            markers.push_back(m);
+        }
+
+        last_markers_count_ = current_markers_count;
+        marker_array_publisher_.publish(markers_msg);
+    }
 
 	void saveImg(std_msgs::Bool save) {
 
