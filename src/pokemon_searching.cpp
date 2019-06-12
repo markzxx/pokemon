@@ -83,7 +83,7 @@ public:
         std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
         visualization_msgs::Marker m;
 
-        m.header.frame_id = markers_msg.header.frame_id;
+//        m.header.frame_id = markers_msg.header.frame_id;
         m.header.stamp = ros::Time::now();
         m.ns = "tags";
         m.scale.x = 1.0;
