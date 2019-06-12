@@ -11,7 +11,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
-#include <set>
+//#include <set>
 
 using namespace cv;
 using namespace std;
@@ -23,7 +23,7 @@ int fileNum = 1;
 int zeroCount = 0;
 bool flag=false;
 bool listen = true;
-set<int> tagId;
+//set<int> tagId;
 
 class Searcher
 {
