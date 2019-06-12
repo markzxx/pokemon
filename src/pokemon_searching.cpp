@@ -9,8 +9,8 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Bool.h>
-
-
+#include <geometry_msgs/Pose.h>
+#include <apriltags/AprilTagDetections.h>
 using namespace cv;
 using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
@@ -20,6 +20,8 @@ Mat img;
 int fileNum = 1;
 int zeroCount = 0;
 bool flag=false;
+bool listen = true;
+set<int> tagId;
 
 class Searcher
 {
@@ -28,8 +30,9 @@ class Searcher
   image_transport::Subscriber image_sub_;
   ros::Publisher image_pub_;
   ros::Subscriber save_sub_;
-  ros::Subscriber move_sub_;
-  ros::Publisher save_pub_;
+	ros::Publisher tag_pub_;
+	ros::Subscriber tag_sub_;
+
 
 public:
   Searcher()
@@ -38,13 +41,13 @@ public:
     // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
 	save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this);
-	move_sub_ = nh_.subscribe("/pokemon_go/auto", 1, &Searcher::autoMove, this);
     image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
-    save_pub_ = nh_.advertise<std_msgs::Bool>("/pokemon_go/save", 1);
+	  tag_pub_ = nh_.advertise<geometry_msgs::Pose>("apriltag_pose", 1);
+//	  tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
 
-    cv::namedWindow(OPENCV_WINDOW);
-	cv::namedWindow(GREY_WINDOW);
-//	cv::namedWindow(CANNY_WINDOW);	
+	  cv::namedWindow(OPENCV_WINDOW);
+	  cv::namedWindow(GREY_WINDOW);
+//	cv::namedWindow(CANNY_WINDOW);
   }
 
   ~Searcher()
