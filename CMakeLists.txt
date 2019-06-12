@@ -22,7 +22,6 @@ find_package(
   OpenCV REQUIRED
 )
 
-
 catkin_package()
 
 include_directories(
