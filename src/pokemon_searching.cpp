@@ -12,7 +12,7 @@
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <explore/costmap_client.h>
+//#include <explore/costmap_client.h>
 
 using namespace cv;
 using namespace std;
@@ -41,8 +41,8 @@ class Searcher
     ros::Subscriber camera_sub_;
 	ros::Subscriber tag_sub_;
     ros::Publisher marker_array_publisher_;
-    tf::TransformListener tf_listener_;
-    Costmap2DClient costmap_client_;
+//    tf::TransformListener tf_listener_;
+//    Costmap2DClient costmap_client_;
 
 
 public:
@@ -57,8 +57,8 @@ public:
 //        camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
         marker_array_publisher_ =
                 nh_.advertise<visualization_msgs::MarkerArray>("tags", 5);
-        tf_listener_ = tf::TransformListener(ros::Duration(10.0));
-        costmap_client_ = Costmap2DClient(nh_, nh_, &tf_listener_);
+//        tf_listener_ = tf::TransformListener(ros::Duration(10.0));
+//        costmap_client_ = Costmap2DClient(nh_, nh_, &tf_listener_);
 		cv::namedWindow(OPENCV_WINDOW);
 //		cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
@@ -91,7 +91,7 @@ public:
         std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
         visualization_msgs::Marker m;
 
-        m.header.frame_id = costmap_client_.getGlobalFrameID();
+        m.header.frame_id = "/my_frame";
         m.header.stamp = ros::Time::now();
         m.ns = "tags";
         m.scale.x = 1.0;
