@@ -64,17 +64,16 @@ public:
 
 	void saveImg(std_msgs::Bool save) {
 
-        for (auto it : tagMap) {
+		auto it = tagMap.begin();
             ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
             tag_pub_.publish(it.second);
             camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
-//            tagMap.erase(it);
-        }
+
 
 
     }
 
-    void screenShot(const std_msgs::Bool a) {
+	void screenShot(std_msgs::Bool a) {
         stringstream stream;
         stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
         imwrite(stream.str(), img);
