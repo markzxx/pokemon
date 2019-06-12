@@ -65,9 +65,9 @@ public:
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
-            double tmp = atg.second.orientation.x + atg.second.orientation.y + atg.second.orientation.z;
-            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.first, atg.second.orientation.x, atg.second.orientation.y,
-                   atg.second.orientation.z, tmp);
+            double tmp = atg.secnod.orientation.x + atg.secnod.orientation.y + atg.secnod.orientation.z;
+            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.first, atg.secnod.orientation.x, atg.secnod.orientation.y,
+                   atg.secnod.orientation.z, tmp);
 
 //			if(tagNumric[atg.id] != tmp)
 //            	autoSave();
