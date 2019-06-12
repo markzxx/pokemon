@@ -50,7 +50,7 @@ public:
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
         camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
         marker_array_publisher_ =
-                private_nh_.advertise<visualization_msgs::MarkerArray>("tags", 5);
+                nh_.advertise<visualization_msgs::MarkerArray>("tags", 5);
 		cv::namedWindow(OPENCV_WINDOW);
 //		cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
