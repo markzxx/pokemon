@@ -75,7 +75,7 @@ public:
 
     }
 
-    void screenShot(std_msgs:: bool &a) {
+    void screenShot(std_msgs::Bool &a) {
         stringstream stream;
         stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
         imwrite(stream.str(), img);
