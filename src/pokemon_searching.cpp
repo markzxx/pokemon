@@ -144,7 +144,7 @@ public:
 
     void autoSave() {
         stringstream stream;
-        stream << "/home/jeremy/pokemon" << fileNum << ".jpg";
+        stream << "/home/jeremy/pokemon/pokemon" << fileNum << ".jpg";
         imwrite(stream.str(), img);
         cout << "pokemon" << fileNum << " had Saved." << endl;
         fileNum++;
@@ -186,9 +186,9 @@ public:
 //		if (rate<0.8) cout << rate<< endl;
 
 		if (abs((r.br().x+r.tl().x)/2-320)<150
-            && abs((r.tl().y+r.br().y))/2-240<150
+            && r.tl().y < 240 && r.br().y > 240
             && r.br().x - r.tl().x > 120
-            && rate < 0.8)
+            && rate < 1)
 		{	good = true;
 //			cout << "good:"<<rate<< endl;
 		}
