@@ -45,7 +45,7 @@ public:
 		image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
         tag_pub_ = nh_.advertise<geometry_msgs::Pose>("/apriltag_pose", 1);
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
-
+        camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
 		cv::namedWindow(OPENCV_WINDOW);
 //		cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
@@ -67,8 +67,6 @@ public:
         auto it = *(tagMap.begin());
         ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
         tag_pub_.publish(it.second);
-//		camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
-
 
 
     }
