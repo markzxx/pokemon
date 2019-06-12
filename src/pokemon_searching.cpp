@@ -24,6 +24,7 @@ int fileNum = 1;
 int zeroCount = 0;
 bool flag = false;
 bool listen_tag = true;
+vector<bool> tagTake(100);
 map<int, geometry_msgs::Pose> tagMap;
 map<int, double> tagNumric;
 unsigned last_markers_count_ = 0;
@@ -70,10 +71,11 @@ public:
             // printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
             //        atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
-            if (abs(tagNumric[atg.id] - tmp) > 0.1 && good)
-
+            if (abs(tagNumric[atg.id] - tmp) > 0.1 && good && tagTake[atg.id] == false) {
+                tagTake[atg.id] = true;
+                tagNumric[atg.id] = tmp;
                 autoSave();
-            tagNumric[atg.id] = tmp;
+            }
 		}
         visualizeFrontiers();
     }
