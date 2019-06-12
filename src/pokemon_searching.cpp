@@ -181,7 +181,7 @@ public:
 			&& r.br().x-r.tl().x > 70) 
 			&& rate < 0.8
 		{	good = true;
-			// cout << "photo! "<< endl;
+			cout << rate<< endl;
 		}
 			
 		else good = false;
