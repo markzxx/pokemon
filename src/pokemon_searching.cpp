@@ -49,7 +49,7 @@ public:
 		image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
         tag_pub_ = nh_.advertise<geometry_msgs::Pose>("/apriltag_pose", 1);
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
-        camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
+//        camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
         marker_array_publisher_ =
                 nh_.advertise<visualization_msgs::MarkerArray>("tags", 5);
 		cv::namedWindow(OPENCV_WINDOW);
@@ -83,7 +83,7 @@ public:
         std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
         visualization_msgs::Marker m;
 
-//        m.header.frame_id = costmap_client_.getGlobalFrameID();
+        m.header.frame_id = 0;
         m.header.stamp = ros::Time::now();
         m.ns = "tags";
         m.scale.x = 1.0;
