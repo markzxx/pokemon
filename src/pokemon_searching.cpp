@@ -162,40 +162,16 @@ public:
 		// Draw an target square on the video stream
 		int height = cv_ptr->image.rows;
 		int width = cv_ptr->image.cols;
-		cv::rectangle(cv_ptr->image, cv::Point(width / 3, height / 6), cv::Point(2 * width / 3, 5 * height / 6),
-					  CV_RGB(255, 0, 0));
-		// 记录外面红框的4个顶点x y坐标
-		rect.data.push_back(width / 3);
-		rect.data.push_back(height / 6);
-		rect.data.push_back(2 * width / 3);
-		rect.data.push_back(height / 6);
-		rect.data.push_back(2 * width / 3);
-		rect.data.push_back(5 * height / 6);
-		rect.data.push_back(width / 3);
-		rect.data.push_back(5 * height / 6);
 
 		//detect the white pokemon, 记录白框的四个顶点
-		Rect r = detect(cv_ptr, rect, width, height);
-		vector<int> dists;
-		dists.push_back(r.tl().x - width / 3);//左
-		dists.push_back(r.tl().y - height / 6);//上
-		dists.push_back(2 * width / 3 - r.br().x);//右
-		dists.push_back(5 * height / 6 - r.br().y);//下
+        Rect r = detect(cv_ptr, width, height);
 
-//    cout<< dists[1] <<endl;
-
-
-//	for (int i = 0; i < 3; i++) {
-//		if (dists[i] < minDis.data) minDis.data = dists[i];
-//	}
-
-//	printf("p1x:%f p1y%f p3x:%f p3y:%f\n", rect.data[0], rect.data[1], rect.data[8],rect.data[9]);
 		// Update GUI Window
 		cv::imshow(OPENCV_WINDOW, cv_ptr->image);
 		cv::waitKey(3);
 	}
 
-	Rect detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height) {
+    Rect detect(cv_bridge::CvImagePtr &cv_ptr, int weight, int height) {
 		int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 40, iLowV = 200, iHighV = 255;
 		img = cv_ptr->image;
 		Mat imgHSV;
