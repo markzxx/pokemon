@@ -75,7 +75,7 @@ public:
         std::vector <visualization_msgs::Marker> &markers = markers_msg.markers;
         visualization_msgs::Marker m;
 
-        m.header.frame_id = costmap_client_.getGlobalFrameID();
+//        m.header.frame_id = costmap_client_.getGlobalFrameID();
         m.header.stamp = ros::Time::now();
         m.ns = "tags";
         m.scale.x = 1.0;
