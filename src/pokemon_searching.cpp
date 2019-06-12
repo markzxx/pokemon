@@ -65,9 +65,9 @@ public:
 	void saveImg(std_msgs::Bool save) {
 
         auto it = *(tagMap.begin());
-            ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
-            tag_pub_.publish(it.second);
-            camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
+        ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
+        tag_pub_.publish(it.second);
+//		camera_sub_ = nh_.subscribe("/apriltag_save", 1, &Searcher::screenShot, this);
 
 
 
