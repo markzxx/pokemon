@@ -164,7 +164,11 @@ public:
 
 		//detect the white pokemon, 记录白框的四个顶点
         Rect r = detect(cv_ptr, width, height);
-        printf("width:%f height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
+        cout << "width: " <<r.br().x-r.tl().x << endl;
+        cout << "height: " <<r.br().y-r.tl().y << endl;
+        cout << "x_center: " <<(r.br().x+r.tl().x)/2 << endl;
+        cout << "y_center: " <<(r.tl().y+r.br().y)/2 << endl;
+        printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
 		printf("width:%d height%d\n", width, height);
 
 		// Update GUI Window
