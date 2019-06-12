@@ -11,6 +11,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
+
 using namespace cv;
 using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
@@ -30,9 +31,8 @@ class Searcher
   image_transport::Subscriber image_sub_;
   ros::Publisher image_pub_;
   ros::Subscriber save_sub_;
-	ros::Publisher tag_pub_;
-	ros::Subscriber tag_sub_;
-
+    ros::Subscriber move_sub_;
+    ros::Publisher save_pub_;
 
 public:
   Searcher()
@@ -41,12 +41,12 @@ public:
     // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
 	save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this);
+      move_sub_ = nh_.subscribe("/pokemon_go/auto", 1, &Searcher::autoMove, this);
     image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
-	  tag_pub_ = nh_.advertise<geometry_msgs::Pose>("apriltag_pose", 1);
-//	  tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
+      save_pub_ = nh_.advertise<std_msgs::Bool>("/pokemon_go/save", 1);
 
-	  cv::namedWindow(OPENCV_WINDOW);
-	  cv::namedWindow(GREY_WINDOW);
+      cv::namedWindow(OPENCV_WINDOW);
+      cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
   }
 
@@ -55,7 +55,7 @@ public:
     cv::destroyWindow(OPENCV_WINDOW);
 	cv::destroyWindow(GREY_WINDOW);
   }
-  
+
   void autoMove(std_msgs::Bool move){
 	  if(move.data){
 		  flag = true;
@@ -101,8 +101,8 @@ public:
 	rect.data.push_back(5*height/6);
 	rect.data.push_back(width/3);
 	rect.data.push_back(5*height/6);
-	
-	//detect the white pokemon, 记录白框的四个顶点
+
+      //detect the white pokemon, 记录白框的四个顶点
 	Rect r = detect(cv_ptr, rect, width, height);
 	vector<int> dists;
 	dists.push_back(r.tl().x - width/3);//左
@@ -143,13 +143,13 @@ public:
     // Update GUI Window
     cv::imshow(OPENCV_WINDOW, cv_ptr->image);
     cv::waitKey(3);
-	
-    // Output modified video stream
+
+      // Output modified video stream
 	if(flag)
 		image_pub_.publish(minDis);
   }
-  
-  Rect detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
+
+    Rect detect(cv_bridge::CvImagePtr &cv_ptr, std_msgs::Float32MultiArray &rect, int weight, int height){
 	int iLowH = 0, iHighH = 180, iLowS = 0, iHighS = 40, iLowV = 200, iHighV = 255;
 	img = cv_ptr->image;
 	Mat imgHSV;
@@ -163,23 +163,23 @@ public:
 	//开操作 (去除一些噪点)
 	Mat element = getStructuringElement(MORPH_RECT, Size(5, 5));
 	morphologyEx(imgThresholded, imgThresholded, MORPH_OPEN, element);
- 
-	//闭操作 (连接一些连通域)
+
+        //闭操作 (连接一些连通域)
 	morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, element);
 	GaussianBlur(imgThresholded,imgThresholded, Size(3,3),0,0);
 	imshow(GREY_WINDOW, imgThresholded);
 	Mat cannyImage;
 	Canny(imgThresholded, cannyImage, 128, 255, 3);
-	
-	vector<vector<Point> > contours;
+
+        vector<vector<Point> > contours;
 	vector<Vec4i> hierarchy;
 	findContours(cannyImage, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0,0));
-	
-	//绘制轮廓
+
+        //绘制轮廓
 	for (int i = 0; i < (int)contours.size(); i++){
 		drawContours(cannyImage, contours, i, Scalar(255), 1, 8);
-    } 
-//	imshow(CANNY_WINDOW, cannyImage);                //用矩形圈出轮廓并返回位置坐标      
+    }
+//	imshow(CANNY_WINDOW, cannyImage);                //用矩形圈出轮廓并返回位置坐标
 	Point2f vertex[4];
 	float max_s=0;
 	int max_idx=0;
@@ -232,9 +232,8 @@ public:
 		}
 	}
 
-	
-		
-	for(int i=0;i<idx.size();i++){
+
+        for(int i=0;i<idx.size();i++){
 		Rect r = rectangles[idx[i]];
 		float s = r.area();
 		if(s>max_s){
@@ -243,25 +242,25 @@ public:
 		}
 		rectangle(img, r.tl(), r.br(), CV_RGB(0,0,255));
 	}
-	
-	rectangle(img, rectangles[max_idx].tl(), rectangles[max_idx].br(), CV_RGB(255,255,0));
+
+        rectangle(img, rectangles[max_idx].tl(), rectangles[max_idx].br(), CV_RGB(255,255,0));
 
 	return rectangles[max_idx];
 //	namedWindow("绘制的最小矩形面积",WINDOW_NORMAL);
 
 //	imshow("绘制的最小矩形面积",img);
   }
-  
-  float dis(Point p1, Point p2){
+
+    float dis(Point p1, Point p2){
 	  return sqrt(pow((p1.x-p2.x),2)+pow((p1.y-p2.y),2));
   }
-  
-  bool cross(Rect  r1, Rect  r2){
+
+    bool cross(Rect  r1, Rect  r2){
 	int error = 30;
 	return (r1+Size(0,error) & r2).area() > 0 || (r1 & r2+Size(0,error)).area() > 0;
   }
-  
-  void mergeRec(int id, vector<int> &merge, vector<Rect> &rectangles){
+
+    void mergeRec(int id, vector<int> &merge, vector<Rect> &rectangles){
 	for(int i=0;i<merge.size();i++){
 		rectangles[id] = rectangles[id] | rectangles[merge[i]];
 	}
