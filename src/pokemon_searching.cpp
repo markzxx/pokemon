@@ -42,7 +42,7 @@ public:
 		image_sub_ = it_.subscribe("/camera/rgb/image_raw", 1, &Searcher::imageCb, this);
 		save_sub_ = nh_.subscribe("/pokemon_go/save", 1, &Searcher::saveImg, this);
 		image_pub_ = nh_.advertise<std_msgs::Int32>("/pokemon_go/searcher", 1);
-		tag_pub_ = nh_.advertise<geometry_msgs::Pose>("apriltag_pose", 1);
+        tag_pub_ = nh_.advertise<geometry_msgs::Pose>("/apriltag_pose", 1);
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
 
 		cv::namedWindow(OPENCV_WINDOW);
@@ -60,8 +60,7 @@ public:
 			return;
 
 		for (auto atg : apriltags.detections) {
-            ROS_ERROR("id: %d", atg.id);
-			if (tagId.find(atg.id) != tagId.end()) {
+            if (tagId.find(atg.id) == tagId.end()) {
 				tag_pub_.publish(atg.pose);
 				tagId.insert(atg.id);
 				ROS_ERROR("tag: %d", atg.id);
@@ -72,13 +71,12 @@ public:
 	}
 
 	void saveImg(std_msgs::Bool save) {
-		if (save.data) {
-			stringstream stream;
-			stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
-			imwrite(stream.str(), img);
-			cout << "pokemon" << fileNum << " had Saved." << endl;
-			fileNum++;
-		}
+        stringstream stream;
+        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
+        imwrite(stream.str(), img);
+        cout << "pokemon" << fileNum << " had Saved." << endl;
+        fileNum++;
+        listen_tag = true;
 	}
 
 	void imageCb(const sensor_msgs::ImageConstPtr &msg) {
