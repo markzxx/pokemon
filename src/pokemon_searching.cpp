@@ -11,6 +11,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
+#include <set>
 
 using namespace cv;
 using namespace std;
