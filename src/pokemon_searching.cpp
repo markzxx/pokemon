@@ -178,14 +178,14 @@ public:
         // printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
 		// printf("width:%d height%d\n", width, height);
 
-		if (rate<0.8) cout << rate<< endl;
+//		if (rate<0.8) cout << rate<< endl;
 
 		if (abs((r.br().x+r.tl().x)/2-320)<150 
 			&& abs((r.tl().y+r.br().y))/2-240<150
 			&& r.br().x-r.tl().x > 70
 			&& rate < 0.8)
 		{	good = true;
-			cout << "good:"<<rate<< endl;
+//			cout << "good:"<<rate<< endl;
 		}
 			
 		else good = false;
