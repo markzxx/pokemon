@@ -63,7 +63,7 @@ public:
 
 	void saveImg(std_msgs::Bool save) {
         for (auto it : tagId) {
-            ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.x, it.second.y);
+            ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
         }
 //        stringstream stream;
 //        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
