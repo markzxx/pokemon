@@ -59,6 +59,7 @@ public:
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
+            autoSave();
 		}
 	}
 
@@ -71,12 +72,16 @@ public:
 
     }
 
-	void screenShot(std_msgs::Bool a) {
+    void autoSave() {
         stringstream stream;
-        stream << "/home/ubuntu/1001/pokemon" << fileNum << ".jpg";
+        stream << "/home/jeremy/pokemon" << fileNum << ".jpg";
         imwrite(stream.str(), img);
         cout << "pokemon" << fileNum << " had Saved." << endl;
         fileNum++;
+    }
+
+	void screenShot(std_msgs::Bool a) {
+        autoSave();
 	}
 
 	void imageCb(const sensor_msgs::ImageConstPtr &msg) {
