@@ -24,6 +24,7 @@ int zeroCount = 0;
 bool flag = false;
 bool listen_tag = true;
 map<int, geometry_msgs::Pose> tagMap;
+unsigned last_markers_count_ = 0;
 
 class Searcher
 {
@@ -96,7 +97,6 @@ public:
             m.scale.x = 0.1;
             m.scale.y = 0.1;
             m.scale.z = 0.1;
-            m.points = frontier.points;
 
             markers.push_back(m);
             ++id;
