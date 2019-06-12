@@ -46,13 +46,13 @@ public:
 		tag_sub_ = nh_.subscribe("/apriltags/detections", 1, &Searcher::collect_tag, this);
 
 		cv::namedWindow(OPENCV_WINDOW);
-		cv::namedWindow(GREY_WINDOW);
+//		cv::namedWindow(GREY_WINDOW);
 //	cv::namedWindow(CANNY_WINDOW);
 	}
 
 	~Searcher() {
 		cv::destroyWindow(OPENCV_WINDOW);
-		cv::destroyWindow(GREY_WINDOW);
+//		cv::destroyWindow(GREY_WINDOW);
 	}
 
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
@@ -147,7 +147,7 @@ public:
 		//闭操作 (连接一些连通域)
 		morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, element);
 		GaussianBlur(imgThresholded, imgThresholded, Size(3, 3), 0, 0);
-		imshow(GREY_WINDOW, imgThresholded);
+//		imshow(GREY_WINDOW, imgThresholded);
 		Mat cannyImage;
 		Canny(imgThresholded, cannyImage, 128, 255, 3);
 
