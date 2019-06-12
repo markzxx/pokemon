@@ -12,7 +12,7 @@
 #include <geometry_msgs/Pose.h>
 #include <apriltags/AprilTagDetections.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <explore/costmap_client.h>
+#include <explore_lite/costmap_client.h>
 
 using namespace cv;
 using namespace std;
