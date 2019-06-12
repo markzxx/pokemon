@@ -24,6 +24,7 @@ int zeroCount = 0;
 bool flag = false;
 bool listen_tag = true;
 map<int, geometry_msgs::Pose> tagMap;
+map<int, double> tagNumric;
 unsigned last_markers_count_ = 0;
 
 class Searcher
@@ -64,7 +65,13 @@ public:
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
-            autoSave();
+            double tmp = atg.second.orientation.x + atg.second.orientation.y + atg.second.orientation.z;
+            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.first, atg.second.orientation.x, atg.second.orientation.y,
+                   atg.second.orientation.z, tmp);
+
+//			if(tagNumric[atg.id] != tmp)
+//            	autoSave();
+            tagNumric[atg.id] = tmp;
 		}
         visualizeFrontiers();
     }
