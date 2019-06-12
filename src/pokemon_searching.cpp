@@ -18,6 +18,7 @@ using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
 static const std::string GREY_WINDOW = "灰度";
 static const std::string CANNY_WINDOW = "canny";
+bool good = false;
 Mat img;
 int fileNum = 1;
 int zeroCount = 0;
@@ -164,12 +165,20 @@ public:
 
 		//detect the white pokemon, 记录白框的四个顶点
         Rect r = detect(cv_ptr, width, height);
+        // 78 185 252 240
+        // 640 480 -> 320 240
         cout << "width: " <<r.br().x-r.tl().x << endl;
         cout << "height: " <<r.br().y-r.tl().y << endl;
         cout << "x_center: " <<(r.br().x+r.tl().x)/2 << endl;
         cout << "y_center: " <<(r.tl().y+r.br().y)/2 << endl;
-        printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
-		printf("width:%d height%d\n", width, height);
+        // printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
+		// printf("width:%d height%d\n", width, height);
+
+		if (abs((r.br().x+r.tl().x)/2-320)<5 
+			&& abs((r.tl().y+r.br().y)/2-240<5) 
+			&& r.br().x-r.tl().x > 200) 
+			good = true;
+		else good = false;
 
 		// Update GUI Window
 		cv::imshow(OPENCV_WINDOW, cv_ptr->image);
