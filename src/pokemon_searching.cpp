@@ -180,10 +180,10 @@ public:
 
 //		if (rate<0.8) cout << rate<< endl;
 
-		if (abs((r.br().x+r.tl().x)/2-320)<150 
-			&& abs((r.tl().y+r.br().y))/2-240<150
-			&& r.br().x-r.tl().x > 70
-			&& rate < 0.8)
+		if (abs((r.br().x+r.tl().x)/2-320)<150
+            && abs((r.tl().y+r.br().y))/2-240<150
+            && r.br().x - r.tl().x > 120
+            && rate < 0.8)
 		{	good = true;
 //			cout << "good:"<<rate<< endl;
 		}
