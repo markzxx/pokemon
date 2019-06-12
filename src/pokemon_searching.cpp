@@ -18,11 +18,12 @@ using namespace std;
 static const std::string OPENCV_WINDOW = "Pokemon Search";
 static const std::string GREY_WINDOW = "灰度";
 static const std::string CANNY_WINDOW = "canny";
+bool good = false;
 Mat img;
 int fileNum = 1;
 int zeroCount = 0;
 bool flag = false;
-bool good = false;
+bool listen_tag = true;
 map<int, geometry_msgs::Pose> tagMap;
 map<int, double> tagNumric;
 unsigned last_markers_count_ = 0;
@@ -65,12 +66,12 @@ public:
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
 		for (auto atg : apriltags.detections) {
             tagMap[atg.id] = atg.pose;
-            double tmp =
-                    atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
-//            printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
-                   atg.pose.orientation.z, atg.pose.orientation.w, tmp);
+            double tmp = atg.pose.orientation.x + atg.pose.orientation.y + atg.pose.orientation.z + atg.pose.orientation.w;
+            // printf("id:%d x:%f y:%f z:%f w:%f sum:%f\n", atg.id, atg.pose.orientation.x, atg.pose.orientation.y,
+            //        atg.pose.orientation.z, atg.pose.orientation.w, tmp);
 
             if (abs(tagNumric[atg.id] - tmp) > 0.1 && good)
+
                 autoSave();
             tagNumric[atg.id] = tmp;
 		}
@@ -130,6 +131,8 @@ public:
         auto it = *(tagMap.begin());
         ROS_ERROR("id:%d x:%f y:%f", it.first, it.second.position.x, it.second.position.y);
         tag_pub_.publish(it.second);
+
+
     }
 
     void autoSave() {
@@ -153,6 +156,8 @@ public:
 			ROS_ERROR("cv_bridge exception: %s", e.what());
 			return;
 		}
+		// 传递出去的信息，外框和内框共16个点
+
 		std_msgs::Float32MultiArray rect;
 
 		// Draw an target square on the video stream
@@ -161,10 +166,30 @@ public:
 
 		//detect the white pokemon, 记录白框的四个顶点
         Rect r = detect(cv_ptr, width, height);
+        // 78 185 252 240
+        // 640 480 -> 320 240
+        // cout << "x: " <<abs((r.br().x+r.tl().x)/2-320) << endl;
+        // cout << "y: " <<abs((r.tl().y+r.br().y)/2-240) << endl;
+        // cout << "width: " <<r.br().x-r.tl().x << endl;
+        float rate = float((r.br().x-r.tl().x))/float((r.br().y-r.tl().y));
+        // cout << "y_center: " <<(r.tl().y+r.br().y)/2 << endl;
+        // printf("width:%d height%f x_center:%f y_center:%f\n", r.br().x-r.tl().x, r.br().y-r.tl().y, (r.br().x+r.tl().x)/2,(r.tl().y+r.br().y)/2);
+		// printf("width:%d height%d\n", width, height);
 
-        if (r.tl())
-            // Update GUI Window
-            cv::imshow(OPENCV_WINDOW, cv_ptr->image);
+		if (rate<0.8) cout << rate<< endl;
+
+		if (abs((r.br().x+r.tl().x)/2-320)<150 
+			&& abs((r.tl().y+r.br().y))/2-240<150
+			&& r.br().x-r.tl().x > 70
+			&& rate < 0.8)
+		{	good = true;
+			cout << "good:"<<rate<< endl;
+		}
+			
+		else good = false;
+
+		// Update GUI Window
+		cv::imshow(OPENCV_WINDOW, cv_ptr->image);
 		cv::waitKey(3);
 	}
 
