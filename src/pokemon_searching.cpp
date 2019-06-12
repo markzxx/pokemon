@@ -56,6 +56,7 @@ public:
 	}
 
 	void collect_tag(const apriltags::AprilTagDetections &apriltags) {
+        ROS_ERROR("listen");
 		if (!listen_tag)
 			return;
 
