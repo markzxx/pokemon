@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   geometry_msgs
         apriltags
+        explore
         )
 
 find_package(
@@ -30,7 +31,7 @@ include_directories(
 )
 
 add_executable(pokeman_search src/pokemon_searching.cpp)
-add_dependencies(pokeman_search apriltags)
+add_dependencies(pokeman_search apriltags explore)
 
 target_link_libraries(
   pokeman_search
